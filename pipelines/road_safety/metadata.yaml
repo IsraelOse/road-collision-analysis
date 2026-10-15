@@ -1,0 +1,19 @@
+name: road_safety
+description: >
+  Cleans 2023 road-collision and vehicle records, joins them, and aggregates
+  road-safety metrics (multi-vehicle rate, casualties, driver age) per police
+  force.
+execution_order:
+  - {block: data_loaders.collision_loader.load_data, type: data_loader}
+  - {block: transformers.clean.clean_collisions, type: transformer}
+  - {block: transformers.clean.clean_vehicles, type: transformer}
+  - {block: transformers.aggregate.valid_collisions, type: transformer}
+  - {block: transformers.aggregate.summary_by_force, type: transformer}
+  - {block: transformers.aggregate.driver_age_by_force, type: transformer}
+  - {block: data_exporters.local_exporter.export_summary, type: data_exporter}
+variables:
+  valid_severity: [1, 2, 3]
+  invalid_speed_limits: [0, 5, 150]
+schedule:
+  interval: "0 5 1 * *"
+  enabled: false
